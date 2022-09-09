@@ -68,4 +68,4 @@ for i in range(len(values)):
 # for i in range(5):
 #     k = random.choice(keys)
 #     a = random.randint(0,len(dict[k])-1)
-    generated_words = random.choices(dict[k], weights=dict[k])
+#     generated_words = random.choices(dict[k], weights=dict[k])
