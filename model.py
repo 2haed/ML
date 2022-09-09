@@ -14,7 +14,7 @@ class BigramModel:
 
     def fit(self, filename: str) -> tuple[bool, Union[Exception, None]]:
         try:
-            with open(filename, 'r') as reading_file:
+            with open(filename, 'r', encoding='UTF-8') as reading_file:
                 text = reading_file.read()
         except FileNotFoundError as e:
             return False, e
