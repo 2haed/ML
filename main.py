@@ -2,53 +2,62 @@ import regex as re
 import numpy as np
 import random
 from collections import Counter
+import time
+
+FILENAME = 'text_for_training_eng.txt'
 
 
-def reading(filename) -> list:
+def str_reading(filename) -> list:
     with open(filename, 'r') as reading_file:
-        text = [re.split("[^a-zа-яё]+", re.sub("[[:punct:]]", '', x.lower().strip())) for x in reading_file.readlines()]
-        sum = []
-        for i in text:
-            sum += i
-        ctr = Counter(sum)
-        list = []
-        for key, val in ctr.items():
-            items = (key, val / len(ctr))
-            list.append(items)
-        return list
+        text = reading_file.read()
+    text = re.sub("[[:punct:]]", '', text.lower())
+    text = re.split("[^a-яё]+", text)
+    return text
 
 
-# def tokenization(text) -> dict:
-#     bigram_counts = {}
-#     for i in range(len(text)- 1):
-#         bigram = (text[i], text[i+1])
-#         if bigram in bigram_counts.keys():
-#             bigram_counts[bigram] += 1
-#         else:
-#             bigram_counts[bigram] = 1
-#     print(bigram_counts)
-#     return bigram_counts
+def dict(text) -> dict:
+    dict = {}
+    for i in range(len(text) - 1):
+        if text[i] not in dict:
+            dict[text[i]] = [text[i + 1]]
+        else:
+            dict[text[i]].append(text[i + 1])
+    for key, val in dict.items():
+        for k, v in Counter(val).items():
+            val = (k, v)
+            if val in dict[key]:
+                dict[key] = [val]
+            else:
+                dict[key].append(val)
+    for key, val in dict.items():
+        filtered_val = [x for x in val if type(x) != str]
+        val.clear()
+        for x in filtered_val:
+            val.append(x)
+    return dict
 
 
-def generator(list, length) -> str:
-    word_list = [x[0] for x in list]
-    variaty_list = [x[1] for x in list]
+def generator(filename, length) -> str:
+    dictionary = dict(str_reading(filename))
+    keys = list(dictionary.keys())
+    variaty_list = []
+    word_list = []
     generated_str = ''
-    generated_words = random.choices(word_list, weights=variaty_list, k=length)
-    for word in generated_words:
-        generated_str += word
+    k = random.choice(keys)
+    for i in range(length):
+        for j in range(len(dictionary[k])):
+            variaty_list.append(dictionary[k][j][1])
+            word_list.append(dictionary[k][j][0])
+        generated_word = random.choices(word_list, weights=variaty_list, k=1)
+        variaty_list.clear()
+        word_list.clear()
+        generated_str += generated_word[0]
         generated_str += ' '
+        k = generated_word[0]
     return generated_str
 
 
-def write(filename, str):
-    with open(filename, 'w') as writing_file:
-        writing_file.write(str)
-
-
-formatted_text = reading('text_for_training_eng.txt')
-
-# word_list = [x[0] for x in formatted_text]
-
-# tokenization(word_list)
-print(generator(formatted_text, int(input('Введите длину предложения: '))))
+x1 = time.time()
+print(*generator('text_for_training_eng.txt', int(input())).split())
+x2 = time.time()
+print(f'\nВремя потраченное на генерацию: {x2 - x1}')
