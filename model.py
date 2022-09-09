@@ -45,28 +45,34 @@ class BigramModel:
         except Exception as e:
             return False, e
 
-
-    def generate(self, length, prefix=None) -> str:
-        with open(self.model_filename, 'rb') as f:
-            self.model_weights = pickle.load(f)
-        keys = list(self.model_weights.keys())
-        variaty_list = []
-        word_list = []
-        generated_str = prefix + " " if prefix is not None else ''
-        k = random.choice(keys)
-        for _ in range(length - int(prefix is not None)):
-            for j in range(len(self.model_weights[k])):
-                variaty_list.append(self.model_weights[k][j][1])
-                word_list.append(self.model_weights[k][j][0])
-            generated_word = random.choices(word_list, weights=variaty_list, k=1)
-            variaty_list.clear()
-            word_list.clear()
-            generated_str += generated_word[0]
-            generated_str += ' '
-            k = generated_word[0]
-        yield generated_str
-        with open('generated.txt', 'w') as f:
-            f.write(generated_str)
+    def generate(self, length, prefix=None) -> tuple[bool, Union[Exception, None]]:
+        try:
+            with open(self.model_filename, 'rb') as f:
+                self.model_weights = pickle.load(f)
+        except FileNotFoundError as e:
+            return False, e
+        try:
+            keys = list(self.model_weights.keys())
+            variaty_list = []
+            word_list = []
+            generated_str = prefix + " " if prefix is not None else ''
+            k = random.choice(keys)
+            for _ in range(length - int(prefix is not None)):
+                for j in range(len(self.model_weights[k])):
+                    variaty_list.append(self.model_weights[k][j][1])
+                    word_list.append(self.model_weights[k][j][0])
+                generated_word = random.choices(word_list, weights=variaty_list, k=1)
+                variaty_list.clear()
+                word_list.clear()
+                generated_str += generated_word[0]
+                generated_str += ' '
+                k = generated_word[0]
+            yield generated_str
+            with open('generated.txt', 'w') as f:
+                f.write(generated_str)
+            return True, str
+        except Exception as e:
+            return False, e
 
     def __enter__(self):
         return self
