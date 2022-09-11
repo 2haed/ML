@@ -12,33 +12,36 @@ def str_reading(filename: str):
     try:
         with open(filename, 'r', encoding='UTF-8') as reading_file:
             text = reading_file.read()
-            # text = re.sub("[[:punct:]]", '', text.lower())
             text = re.sub(r"[!?]+$", '', text.lower())
             text = re.split("[^a-яё]+", text)
             return text
     except FileNotFoundError as e:
         return False, e
 
-def dict(text) -> dict:
+def dict(text, n) -> dict:
     dict = {}
-    for i in range(len(text) - 2):
+    for i in range(len(text) - (n-1)):
+        next_words = []
+        for j in range(n-1):
+            next_words.append(text[i+j+1])
         if text[i] not in dict:
-            dict[text[i]] = [text[i+1] + " " + text[i+2]]
+            dict[text[i]] = [' '.join(next_words)]
         else:
-            dict[text[i]].append(text[i+1] + " " + text[i+2])
-    for key, val in dict.items():
-        for k, v in Counter(val).items():
-            val = (k,v)
-            if val in dict[key]:
-                dict[key] = [val]
-            else:
-                dict[key].append(val)
-    for key, val in dict.items():
-        filtered_val = [x for x in val if type(x) != str]
-        val.clear()
-        for x in filtered_val:
-            val.append(x)
-    return dict
+            dict[text[i]].append([' '.join(next_words)])
+    print(dict)
+    # for key, val in dict.items():
+    #     for k, v in Counter(val).items():
+    #         val = (k,v)
+    #         if val in dict[key]:
+    #             dict[key] = [val]
+    #         else:
+    #             dict[key].append(val)
+    # for key, val in dict.items():
+    #     filtered_val = [x for x in val if type(x) != str]
+    #     val.clear()
+    #     for x in filtered_val:
+    #         val.append(x)
+    # return dict
 
 
 def generate(dictionary, length) -> str:
@@ -59,8 +62,7 @@ def generate(dictionary, length) -> str:
         generated_str += ' '
         k = generated_phrase[0].split()[1] if generated_phrase[0].split()[1] in dictionary else random.choice(keys)
     splitted_str = generated_str.split()
-    while len(splitted_str) > length:
-        splitted_str.pop()
+    splitted_str = splitted_str[:(len(splitted_str)-length)]
     generated_str = ' '.join(splitted_str)
     print(generated_str)
 
@@ -84,8 +86,8 @@ def generate(dictionary, length) -> str:
 # print(word_list)
 # print(variaty_list)
 x1 = time.time()
-dictionary = dict(str_reading(filename))
+dictionary = dict(str_reading(filename), 5)
 # print(dictionary)
-generate(dictionary, int(input('Введите длину строки: ')))
+# generate(dictionary, int(input('Введите длину строки: ')))
 x2 = time.time()
 print(f' Программма сработала за: {x2-x1}')
