@@ -2,7 +2,6 @@ import random
 import pickle
 import string
 from typing import Union
-import regex as re
 from collections import Counter
 from dataclasses import dataclass, field
 
@@ -19,9 +18,7 @@ class NgrammModel:
         except FileNotFoundError as e:
             return False, e
         try:
-            text = re.sub(r"«»[!?]+$", '', text.lower())
-            text = text.rstrip(string.punctuation)
-            text = re.split("[^a-яё]+", text)
+            text = text.lower().translate(str.maketrans("", "", string.punctuation + "«»—…")).replace('\n\n', '\n').split(" ")
             dict = {}
             for i in range(len(text) - (n - 1)):
                 next_words = []
@@ -56,6 +53,7 @@ class NgrammModel:
             return False, e
         try:
             if len(self.model_weights) != 0:
+                random.seed(random.randint(0, len(self.model_weights)))
                 keys = list(self.model_weights.keys())
                 variaty_list = []
                 word_list = []
