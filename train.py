@@ -2,6 +2,7 @@ import argparse
 import os
 import random
 import pickle
+import string
 from typing import Union
 import regex as re
 from collections import Counter
@@ -9,26 +10,29 @@ from dataclasses import dataclass, field
 
 
 @dataclass
-class BigramModel:
+class NgrammModel:
     model_filename: str = field(default="model.pkl")
     model_weights: dict = field(default_factory=dict)
 
-    def fit(self, filename: str) -> tuple[bool, Union[Exception, None]]:
+    def fit(self, filename: str, n: int) -> tuple[bool, Union[Exception, None]]:
         try:
             with open(filename, 'r', encoding='UTF-8') as reading_file:
                 text = reading_file.read()
         except FileNotFoundError as e:
             return False, e
-
         try:
-            text = re.sub("[[:punct:]]", '', text.lower())
+            text = re.sub(r"«»[!?]+$", '', text.lower())
+            text = text.rstrip(string.punctuation)
             text = re.split("[^a-яё]+", text)
             dict = {}
-            for i in range(len(text) - 1):
+            for i in range(len(text) - (n - 1)):
+                next_words = []
+                for j in range(n - 1):
+                    next_words.append(text[i + j + 1])
                 if text[i] not in dict:
-                    dict[text[i]] = [text[i + 1]]
+                    dict[text[i]] = [' '.join(next_words)]
                 else:
-                    dict[text[i]].append(text[i + 1])
+                    dict[text[i]].append(' '.join(next_words))
             for key, val in dict.items():
                 for k, v in Counter(val).items():
                     val = (k, v)
@@ -53,21 +57,26 @@ class BigramModel:
         except FileNotFoundError as e:
             return False, e
         try:
-            keys = list(self.model_weights.keys())
-            variaty_list = []
-            word_list = []
-            generated_str = prefix + " " if prefix is not None else ''
-            k = random.choice(keys)
-            for _ in range(length - int(prefix is not None)):
-                for j in range(len(self.model_weights[k])):
-                    variaty_list.append(self.model_weights[k][j][1])
-                    word_list.append(self.model_weights[k][j][0])
-                generated_word = random.choices(word_list, weights=variaty_list, k=1)
-                variaty_list.clear()
-                word_list.clear()
-                generated_str += generated_word[0]
-                generated_str += ' '
-                k = generated_word[0]
+            if len(self.model_weights) != 0:
+                keys = list(self.model_weights.keys())
+                variaty_list = []
+                word_list = []
+                if prefix.split()[-1] not in self.model_weights.keys():
+                    k = random.choice(keys)
+                else:
+                    k = prefix.split()[-1]
+                    generated_str = k
+                for i in range(length):
+                    for j in range(len(self.model_weights[k])):
+                        variaty_list.append(self.model_weights[k][j][1])
+                        word_list.append(self.model_weights[k][j][0])
+                    generated_phrase = random.choices(word_list, weights=variaty_list, k=1)
+                    variaty_list.clear()
+                    word_list.clear()
+                    generated_str += k + " " if i > 0 and k != generated_str.split()[-1] else " "
+                    generated_str += generated_phrase[0]
+                    k = generated_phrase[0].split()[-1] if generated_phrase[0].split()[-1] in self.model_weights else random.choice(keys)
+                generated_str = ' '.join(generated_str.split()[:length]).replace("  ", " ")
             yield generated_str
             with open('generated.txt', 'w') as f:
                 f.write(generated_str)
@@ -85,11 +94,12 @@ class BigramModel:
 def main():
     parser = argparse.ArgumentParser(description='ngramm-Model')
     parser.add_argument("--input-dir", help="Input directory")
-    parser.add_argument("--model", nargs='?', help="Model filename")
+    parser.add_argument("--model", help="Model filename")
+    parser.add_argument("--n", nargs='?', help="Choose n in ngramm-model")
     args = parser.parse_args()
-    with BigramModel(model_filename=args.model) as model:
+    with NgrammModel(model_filename=args.model) as model:
         for filename in os.listdir(args.input_dir):
-            processed, err = model.fit(args.input_dir + "/" + filename)
+            processed, err = model.fit(args.input_dir + "/" + filename, int(args.n))
             if processed:
                 print(filename, "processed")
             else:
