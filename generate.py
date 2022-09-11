@@ -1,5 +1,5 @@
 import argparse
-from model import BigramModel
+from train import BigramModel
 
 
 

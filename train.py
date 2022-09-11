@@ -1,6 +1,5 @@
 import argparse
 import os
-from model import BigramModel
 import random
 import pickle
 from typing import Union
