@@ -1,26 +1,30 @@
+import time
+
 import regex as re
 import numpy as np
 import random
 from collections import Counter
 
-filename = 'text_for_training_eng.txt'
+filename = 'Palahniuk Chuck. Fight Club - royallib.ru.txt'
 
-def list_reading(filename) -> list:
-    with open(filename, 'r') as reading_file:
-        text = [re.split("[^a-zа-яё]+", re.sub("[[:punct:]]", '', x.lower().strip())) for x in reading_file.readlines()]
-        sum = []
-        for i in text:
-            sum += i
-        return sum
 
-def dict(list) -> dict:
+def str_reading(filename: str):
+    try:
+        with open(filename, 'r', encoding='windows-1251') as reading_file:
+            text = reading_file.read()
+            text = re.sub(r"[!?]+$", '', text.lower())
+            text = re.split("[^a-яё]+", text)
+            return text
+    except FileNotFoundError as e:
+        return False, e
+
+def dict(text) -> dict:
     dict = {}
-    for i in range(len(list) - 1):
-        if list[i] not in dict:
-            dict[list[i]] = [list[i+1]]
+    for i in range(len(text) - 2):
+        if text[i] not in dict:
+            dict[text[i]] = [text[i+1] + " " + text[i+2]]
         else:
-            dict[list[i]].append(list[i+1])
-    # print(dict)
+            dict[text[i]].append(text[i+1] + " " + text[i+2])
     for key, val in dict.items():
         for k, v in Counter(val).items():
             val = (k,v)
@@ -36,36 +40,50 @@ def dict(list) -> dict:
     return dict
 
 
-
-def generator(filename, length) -> list:
+def generate(dictionary, length) -> str:
+    keys = list(dictionary.keys())
+    variaty_list = []
+    word_list = []
     generated_str = ''
-    dictionary = dict(list_reading(filename))
-    key_list = dictionary.keys()
-    print(key_list)
+    k = random.choice(keys)
     for i in range(length):
-        k = random.choice(key_list)
-        generated_words = random.choices(k, weights=dict[k])
+        for j in range(len(dictionary[k])):
+            variaty_list.append(dictionary[k][j][1])
+            word_list.append(dictionary[k][j][0])
+        generated_phrase = random.choices(word_list, weights=variaty_list, k=1)
+        variaty_list.clear()
+        word_list.clear()
+        generated_str += k + " " if i > 0 and k != generated_str.split()[-1] else " "
+        generated_str += generated_phrase[0]
+        generated_str += ' '
+        k = generated_phrase[0].split()[1] if generated_phrase[0].split()[1] in dictionary else random.choice(keys)
+    splitted_str = generated_str.split()
+    splitted_str = splitted_str[:(len(splitted_str)-length)]
+    generated_str = ' '.join(splitted_str)
+    print(generated_str)
 
 
-dict(list_reading('test.txt'))
-# print(generator('test.txt', 5))
-dict = {
-    'ads': [('ahjdfd', 3), ('gsasdddf', 2),],
-    'asdds': [('saasdd', 1), ('gsdf', 1), ('asasdd', 2)],
-    'asdfs': [('sagdfgd', 2), ('asdgsdf', 1),],
-    'gdfs': [('sasdd', 5), ('agsdf', 1),]
-}
-values = list(dict.values())
-keys = list(dict.keys())
-k = random.choice(keys)
-a = random.randint(0,len(dict[k])-1)
-print(a)
-print(dict[k])
-print(values)
-for i in range(len(values)):
-    for j in i:
-        print(values[i][j])
-# for i in range(5):
-#     k = random.choice(keys)
-#     a = random.randint(0,len(dict[k])-1)
-#     generated_words = random.choices(dict[k], weights=dict[k])
+# dictionary = {
+#     'ads': [('ahjdfd asd', 3), ('gsas dddf', 2),],
+#     'asdds': [('saa sdd', 1), ('gs df', 1), ('asas dd', 2)],
+#     'asdfs': [('sag dfgd', 2), ('asd gsdf', 1),],
+#     'gdfs': [('sa sdd', 5), ('ag sdf', 1),]
+# }
+# key = list(dictionary.keys())
+# values = list(dictionary.values())
+# k = random.choice(key)
+# variaty_list = []
+# word_list = []
+# # for val, key in dict.items():
+# #     print(val, key[0][0].split()[random.randint(0,1)])
+# for j in range(len(dictionary[k])):
+#     variaty_list.append(dictionary[k][j][1])
+#     word_list.append(dictionary[k][j][0])
+# print(word_list)
+# print(variaty_list)
+x1 = time.time()
+dictionary = dict(str_reading(filename))
+# print(dictionary)
+generate(dictionary, int(input('Введите длину строки: ')))
+x2 = time.time()
+print(f' Программма сработала за: {x2-x1}')
