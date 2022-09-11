@@ -54,6 +54,7 @@ class NgrammModel:
         try:
             if len(self.model_weights) != 0:
                 random.seed(random.randint(0, len(self.model_weights)))
+                print("yes")
                 keys = list(self.model_weights.keys())
                 variaty_list = []
                 word_list = []
