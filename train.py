@@ -77,6 +77,8 @@ class NgrammModel:
                     generated_str += generated_phrase[0]
                     k = generated_phrase[0].split()[-1] if generated_phrase[0].split()[-1] in self.model_weights else random.choice(keys)
                 generated_str = ' '.join(generated_str.split()[:length]).replace("  ", " ")
+            else:
+                generated_str = 'Текст слишком короткий для генерации по данной модели'
             yield generated_str
             with open('generated.txt', 'w') as f:
                 f.write(generated_str)
