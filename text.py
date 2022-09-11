@@ -5,12 +5,12 @@ import numpy as np
 import random
 from collections import Counter
 
-filename = 'data\London Dzhek. Belyy Klyk - BooksCafe.Net.txt'
+filename = 'Palahniuk Chuck. Fight Club - royallib.ru.txt'
 
 
 def str_reading(filename: str):
     try:
-        with open(filename, 'r', encoding='UTF-8') as reading_file:
+        with open(filename, 'r', encoding='windows-1251') as reading_file:
             text = reading_file.read()
             text = re.sub(r"[!?]+$", '', text.lower())
             text = re.split("[^a-яё]+", text)
