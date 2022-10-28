@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/data/Gofman Ernst. Mademuazel de Skyuderi - BooksCafe.Net.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/data/London Dzhek. Abordazh otbit - BooksCafe.Net.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/data/London Dzhek. Belyy Klyk - BooksCafe.Net.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/data/Strugackiy Arkadiy. Piknik na obochine - BooksCafe.Net.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/data/Strugackiy Arkadiy. Trudno byt bogom - BooksCafe.Net.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/data/Мартин Иден. Джек Лондон.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/data/Толстой Лев. Война и мир. Шедевр мировой литературы в одном томе - royallib.com.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/generate.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/model.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/test.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/text.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/train.py" charset="UTF-8" />
+  </component>
+</project>

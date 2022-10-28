@@ -18,7 +18,8 @@ class NgrammModel:
         except FileNotFoundError as e:
             return False, e
         try:
-            text = text.lower().translate(str.maketrans("", "", string.punctuation + "«»—…")).replace('\n\n', '\n').split(" ")
+            text = text.lower().translate(str.maketrans("", "", string.punctuation + "«»—…")).replace('\n\n',
+                                                                                                      '\n').split(" ")
             dict = {}
             for i in range(len(text) - (n - 1)):
                 next_words = []
@@ -78,7 +79,8 @@ class NgrammModel:
                     word_list.clear()
                     generated_str += k + " " if i > 0 and k != generated_str.split()[-1] else " "
                     generated_str += generated_phrase[0]
-                    k = generated_phrase[0].split()[-1] if generated_phrase[0].split()[-1] in self.model_weights else random.choice(keys)
+                    k = generated_phrase[0].split()[-1] if generated_phrase[0].split()[
+                                                               -1] in self.model_weights else random.choice(keys)
                 generated_str = ' '.join(generated_str.split()[:length]).replace("  ", " ")
                 generated_str += ' '
             else:

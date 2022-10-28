@@ -2,6 +2,7 @@ import argparse
 import os
 from model import NgrammModel
 
+
 def main():
     parser = argparse.ArgumentParser(description='ngramm-Model')
     parser.add_argument("--input-dir", help="Input directory")
